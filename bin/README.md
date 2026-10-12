@@ -31,6 +31,27 @@ The executables are not code-signed, so the first time you run one, Windows
 SmartScreen may show this warning. Click **More info → Run anyway**. Only
 do this for files downloaded from this repository.
 
+### If it doesn't open
+
+Studio needs nothing installed: the Visual C++ runtime is built in, and it
+draws with DirectX 12, which every Windows 10 and 11 PC has. On PCs without a
+working graphics driver, it uses Windows' built-in software renderer, and if
+DirectX fails it restarts itself with OpenGL. If it still can't start, it
+shows a message saying why instead of closing silently.
+
+| Symptom | Fix |
+|---|---|
+| Nothing happens, or "Windows protected your PC" | See above. Also right-click the `.exe` → **Properties**, tick **Unblock** if shown, then **OK** |
+| "This app can't run on your PC" | The PC runs 32-bit Windows; Studio needs 64-bit Windows 10 or 11 |
+| A black or garbled window | A graphics driver problem. Start it with the software renderer: run `$env:GRAPHYDRA_GRAPHICS = "software"; .\graphydra-studio.exe` in PowerShell, and update the graphics driver |
+| An error message about graphics | Update the graphics driver (Windows Update → Advanced options → Optional updates), or run Studio on the PC itself rather than over Remote Desktop |
+
+Studio writes a short log to `%APPDATA%\GrapHydra\studio.log`: when it
+started, which graphics adapter it used, and any error. Paste
+`%APPDATA%\GrapHydra` into File Explorer's address bar to find it, and
+include it when reporting a problem. **Help → About** also shows the
+graphics adapter in use.
+
 ## Run the command-line tool
 
 ```powershell

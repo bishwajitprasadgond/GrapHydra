@@ -3,6 +3,7 @@
 A desktop app for `.graph` databases: create them, see and explore the
 graph, edit nodes and relationships, and run queries. It is a single
 Windows executable, `graphydra-studio.exe`, with no installer or runtime.
+Download it from the repository's [`bin/`](../bin/README.md) folder.
 
 ![GrapHydra Studio: Explorer on the left, the graph in the middle, the Inspector on the right](images/studio-graph-dark.png)
 
@@ -165,3 +166,36 @@ Theme (**View → Dark theme**), recent files, and query history are stored
 in `%APPDATA%\GrapHydra\studio.json`. Set `GRAPHYDRA_STUDIO_SETTINGS` to
 another path to keep them elsewhere, for example next to a portable copy of
 the app.
+
+## If Studio doesn't start
+
+Studio needs nothing installed: the C runtime is built into the `.exe`, and
+it picks a way to draw automatically:
+
+```mermaid
+flowchart LR
+    start(["Start Studio"]) --> dx{"DirectX 12 or Vulkan<br/>available?"}
+    dx -- "yes: real GPU" --> ok(["Window opens"])
+    dx -- "yes: no GPU driver" --> warp["Windows software renderer"] --> ok
+    dx -- no --> gl["Restart with OpenGL"] --> glok{"OpenGL works?"}
+    glok -- yes --> ok
+    glok -- no --> msg["Message explaining why,<br/>details in studio.log"]
+```
+
+Every start, and every startup error or crash, is written to
+`%APPDATA%\GrapHydra\studio.log`; **Help → About** shows the graphics
+adapter in use. Two environment variables help diagnose drawing problems:
+
+| Variable | Effect |
+|---|---|
+| `GRAPHYDRA_GRAPHICS=software` | Use Windows' software renderer even if a GPU exists. Fixes black or garbled windows caused by a broken graphics driver |
+| `GRAPHYDRA_RENDERER=opengl` | Skip DirectX and Vulkan and draw with OpenGL |
+
+For example, in PowerShell:
+
+```powershell
+$env:GRAPHYDRA_GRAPHICS = "software"; .\graphydra-studio.exe
+```
+
+More fixes (SmartScreen, 32-bit Windows, Remote Desktop) are in
+[bin/README.md](../bin/README.md#if-it-doesnt-open).

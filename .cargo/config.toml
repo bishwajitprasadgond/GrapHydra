@@ -1,0 +1,4 @@
+# Build Windows executables with the C runtime built in, so they run on PCs
+# without the "Microsoft Visual C++ Redistributable" (VCRUNTIME140.dll).
+[target.'cfg(all(windows, target_env = "msvc"))']
+rustflags = ["-C", "target-feature=+crt-static"]
