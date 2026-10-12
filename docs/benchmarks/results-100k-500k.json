@@ -1,0 +1,110 @@
+{
+  "arch": "x86_64",
+  "edges": 500000,
+  "nodes": 100000,
+  "os": "windows",
+  "peak_rss_mib": 649.44921875,
+  "phases": [
+    {
+      "phase": "ingest nodes",
+      "seconds": 0.339615
+    },
+    {
+      "phase": "ingest edges",
+      "seconds": 2.4700938
+    },
+    {
+      "phase": "build 3 property indexes",
+      "seconds": 0.2980359
+    },
+    {
+      "phase": "checkpoint (snapshot + fsync)",
+      "seconds": 1.6113537
+    },
+    {
+      "phase": "cold open (parse + build indexes)",
+      "seconds": 3.7151992
+    }
+  ],
+  "queries": [
+    {
+      "median_ms": 0.0074,
+      "p95_ms": 0.017900000000000003,
+      "p99_ms": 0.0326,
+      "query": "node by id",
+      "rows": 1.0
+    },
+    {
+      "median_ms": 0.018000000000000002,
+      "p95_ms": 0.0331,
+      "p99_ms": 0.053,
+      "query": "one hop out from id",
+      "rows": 3.784
+    },
+    {
+      "median_ms": 0.0205,
+      "p95_ms": 0.0391,
+      "p99_ms": 0.056100000000000004,
+      "query": "one hop both directions, count",
+      "rows": 1.0
+    },
+    {
+      "median_ms": 0.025400000000000002,
+      "p95_ms": 0.06999999999999999,
+      "p99_ms": 0.1157,
+      "query": "two hops, distinct targets",
+      "rows": 1.0
+    },
+    {
+      "median_ms": 0.0921,
+      "p95_ms": 0.17320000000000002,
+      "p99_ms": 0.23479999999999998,
+      "query": "var-length *1..3 from id (LIMIT 100)",
+      "rows": 61.936
+    },
+    {
+      "median_ms": 0.0573,
+      "p95_ms": 0.1184,
+      "p99_ms": 0.14730000000000001,
+      "query": "hash index equality (bucket = p)",
+      "rows": 33.449
+    },
+    {
+      "median_ms": 0.1017,
+      "p95_ms": 0.2076,
+      "p99_ms": 0.2662,
+      "query": "sorted index range (score in [p, p+0.001))",
+      "rows": 1.0
+    },
+    {
+      "median_ms": 4.268,
+      "p95_ms": 7.945900000000001,
+      "p99_ms": 8.8312,
+      "query": "text index match",
+      "rows": 1.0
+    },
+    {
+      "median_ms": 6.502,
+      "p95_ms": 23.1179,
+      "p99_ms": 38.6856,
+      "query": "shortest path between random nodes (*..6)",
+      "rows": 1.0
+    },
+    {
+      "median_ms": 15.7826,
+      "p95_ms": 17.9399,
+      "p99_ms": 17.9399,
+      "query": "label scan + aggregate (full scan)",
+      "rows": 1.0
+    },
+    {
+      "median_ms": 50.787400000000005,
+      "p95_ms": 71.4581,
+      "p99_ms": 71.4581,
+      "query": "unindexed property filter (full scan)",
+      "rows": 1.0
+    }
+  ],
+  "snapshot_mib": 54.84914779663086,
+  "version": "0.1.0"
+}

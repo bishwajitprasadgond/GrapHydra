@@ -1,0 +1,29 @@
+[package]
+name = "graphydra-studio"
+description = "GrapHydra Studio: desktop app to create, visualize, edit, and query .graph databases"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+# Distributed as an executable on GitHub releases, not on crates.io.
+publish = false
+
+[dependencies]
+eframe = { version = "0.33.3", default-features = false, features = ["default_fonts", "glow", "accesskit"] }
+egui_extras = { version = "0.33", default-features = false }
+graphydra-core = { version = "0.1.0", path = "../graphydra-core" }
+rfd = "0.17.2"
+serde_json = "1.0.154"
+
+# Windowing backends only exist on Linux; Windows and macOS need none.
+[target.'cfg(target_os = "linux")'.dependencies]
+eframe = { version = "0.33.3", default-features = false, features = ["x11", "wayland"] }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+egui_kittest = { version = "0.33", features = ["eframe", "wgpu"] }
+image = { version = "0.25", default-features = false, features = ["png"] }

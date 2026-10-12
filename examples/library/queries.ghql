@@ -1,0 +1,76 @@
+// Read-only example queries for the library graph, from simple to advanced.
+// Each statement is preceded by a "// N. Title" comment; run_queries.py prints them in order.
+//
+//   graphydra query examples/library/library.graph -f examples/library/queries.ghql --read-only
+//   python examples/library/run_queries.py
+
+// 1. Every book with its author, oldest first
+MATCH (a:Author)-[:WROTE]->(b:Book)
+RETURN a.name AS author, b.title AS title, b.year AS year
+ORDER BY year;
+
+// 2. Table of contents of one book (chapters in order)
+MATCH (b:Book {title: "The Clockwork Archive"})-[h:HAS_CHAPTER]->(c:Chapter)
+RETURN h.order AS chapter, c.title AS title
+ORDER BY chapter;
+
+// 3. How many pages each chapter has
+MATCH (b:Book)-[:HAS_CHAPTER]->(c:Chapter)-[:HAS_PAGE]->(p:Page)
+RETURN b.title AS book, c.number AS chapter, c.title AS title, count(p) AS pages
+ORDER BY book, chapter;
+
+// 4. Size of each book: chapters, pages, and words
+MATCH (b:Book)-[:HAS_CHAPTER]->(c:Chapter)-[:HAS_PAGE]->(p:Page)
+RETURN b.title AS book, count(DISTINCT c) AS chapters, count(p) AS pages, sum(p.words) AS words
+ORDER BY words DESC;
+
+// 5. Read a page range (uses the sorted index on `number`)
+MATCH (p:Page)
+WHERE p.book = "The Clockwork Archive" AND p.number >= 4 AND p.number <= 6
+RETURN p.number AS page, p.text AS text
+ORDER BY page;
+
+// 6. Which chapter is page 7 in?
+MATCH (b:Book {title: "The Clockwork Archive"})-[:HAS_CHAPTER]->(c:Chapter)-[:HAS_PAGE]->(p:Page {number: 7})
+RETURN c.number AS chapter, c.title AS title;
+
+// 7. Keep reading: the next three pages after page 3, following NEXT links
+MATCH (p:Page {book: "The Clockwork Archive", number: 3})-[:NEXT*1..3]->(n:Page)
+RETURN n.number AS page, n.text AS text
+ORDER BY page;
+
+// 8. Full-text search across every page (uses the text index)
+MATCH (p:Page)
+WHERE text_match(p.text, "brass key")
+RETURN p.book AS book, p.number AS page, p.text AS text
+ORDER BY book, page;
+
+// 9. Characters, ranked by the number of pages that mention them
+MATCH (ch:Character)<-[:MENTIONS]-(p:Page)
+RETURN ch.name AS character, ch.role AS role, count(p) AS pages, count(DISTINCT p.book) AS books
+ORDER BY pages DESC, character;
+
+// 10. Characters who appear on the same page
+MATCH (a:Character)<-[:MENTIONS]-(p:Page)-[:MENTIONS]->(b:Character)
+WHERE a.name < b.name
+RETURN a.name AS first, b.name AS second, count(p) AS shared_pages
+ORDER BY shared_pages DESC, first;
+
+// 11. Cross-book citations, with the chapter on each side
+MATCH (c1:Chapter)-[:HAS_PAGE]->(p:Page)-[r:CITES]->(q:Page)<-[:HAS_PAGE]-(c2:Chapter)
+RETURN p.book AS from_book, c1.title AS from_chapter, q.book AS to_book, c2.title AS to_chapter, r.note AS note
+ORDER BY from_book;
+
+// 12. A series in reading order
+MATCH (b:Book)-[r:PART_OF]->(s:Series)
+RETURN s.name AS series, r.position AS position, b.title AS title
+ORDER BY position;
+
+// 13. Books in a genre, with the publisher
+MATCH (g:Genre {name: "Science Fiction"})<-[:IN_GENRE]-(b:Book)-[:PUBLISHED_BY]->(pub:Publisher)
+RETURN b.title AS title, pub.name AS publisher
+ORDER BY title;
+
+// 14. How is a non-fiction author connected to a fictional character?
+MATCH path = shortestPath((a:Author {name: "Tomas Varga"})-[*..8]-(c:Character {name: "Bram Holt"}))
+RETURN length(path) AS hops, path;

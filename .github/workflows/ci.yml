@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  rust:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux libraries for GrapHydra Studio (windowing, file dialogs)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libxkbcommon-dev
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --exclude graphydra-py --all-targets -- -D warnings
+      - run: cargo test --workspace --exclude graphydra-py
+      - run: cargo test --release -p graphydra-core --test properties
+
+  python:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.9", "3.14"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install maturin pytest hypothesis
+      - run: python -m venv .venv
+      - name: Build and test
+        shell: bash
+        run: |
+          source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate
+          pip install maturin pytest hypothesis
+          maturin develop --release
+          pytest -q
+          # The examples must keep running exactly as documented.
+          python examples/library/build_library.py
+          python examples/library/run_queries.py > /dev/null
+          python examples/library/library_api.py > /dev/null
