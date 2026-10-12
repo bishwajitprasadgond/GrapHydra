@@ -39,7 +39,7 @@ with Graph.open("library.graph", create=True) as g:
     print(rows.to_list())  # [{'title': 'The Clockwork Archive'}]
 ```
 
-**Studio:** run `graphydra-studio.exe`, then **File → New sample database…**
+**Studio:** download [`bin/graphydra-studio.exe`](bin/graphydra-studio.exe) and double-click it, then **File → New sample database…**
 for data to explore, or open any `.graph` file. See the
 [Studio guide](docs/studio.md).
 
@@ -54,7 +54,7 @@ graphydra shell library.graph
 
 ## GrapHydra Studio
 
-A native Windows app: one 8 MB `.exe` with no installer or runtime.
+A native Windows app: one 8 MB `.exe` with no installer or runtime. Get it from [`bin/`](bin/README.md).
 
 | Query tab | Data tab |
 |---|---|
@@ -214,6 +214,7 @@ g.close()?;
 ## Project layout
 
 ```
+bin/                      ready-to-run graphydra-studio.exe and graphydra.exe (Windows)
 crates/graphydra-core     engine: model, storage, journal, indexes, GHQL parser, planner, executor
 crates/graphydra-cli      `graphydra` command-line tool
 crates/graphydra-studio   GrapHydra Studio desktop app (egui), with headless UI tests
@@ -233,7 +234,6 @@ docs/                     architecture, file format, query language, performance
 * [Architecture and design decisions](docs/architecture.md)
 * [`.graph` file format, journal, recovery and concurrency](docs/file-format.md)
 * [Performance and benchmarks](docs/performance.md)
-* [Uploading to PyPI, step by step](PYPI_UPLOAD_GUIDE.md) and [automated releases](PUBLISHING.md)
 
 ## License
 
